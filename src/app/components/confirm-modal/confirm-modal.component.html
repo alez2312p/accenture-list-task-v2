@@ -1,0 +1,21 @@
+<ion-modal
+  [isOpen]="isOpen()"
+  (didDismiss)="onCancel()"
+  css-class="confirm-dialog"
+>
+  <ng-template>
+    <div class="confirm-content">
+      <ion-icon name="warning-outline" size="large" color="warning"></ion-icon>
+      <h2 class="title">{{ title() }}</h2>
+      <p class="message">{{ message() }}</p>
+      <div class="actions">
+        <ion-button fill="clear" (click)="onCancel()">{{
+          cancelText()
+        }}</ion-button>
+        <ion-button color="danger" (click)="onConfirm()">{{
+          confirmText()
+        }}</ion-button>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>

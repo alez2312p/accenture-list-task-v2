@@ -1,0 +1,7 @@
+{
+  "name": "accenture-list-task",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular-standalone"
+}

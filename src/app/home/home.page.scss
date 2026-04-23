@@ -1,0 +1,60 @@
+.filter-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--ion-color-light);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filter-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+  gap: 16px;
+  color: var(--ion-color-medium);
+}
+
+ion-item {
+  --padding-start: 8px;
+}
+
+ion-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.completed {
+  text-decoration: line-through;
+  color: var(--ion-color-medium);
+}
+
+ion-badge {
+  font-size: 10px;
+  padding: 4px 8px;
+  width: fit-content;
+}
+
+ion-fab {
+  margin-bottom: var(--ion-safe-area-bottom, 0);
+  margin-right: 16px;
+}
+
+@media (min-width: 768px) {
+  ion-list {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}

@@ -1,0 +1,27 @@
+<ion-modal [isOpen]="isOpen()" (didDismiss)="onDismiss()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ title() }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="onDismiss()">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <ng-content></ng-content>
+    </ion-content>
+    <ion-footer>
+      <ion-toolbar>
+        <ion-button
+          expand="block"
+          [disabled]="isSaveDisabled()"
+          (click)="onSave()">
+          {{ finalSaveText() }}
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
+  </ng-template>
+</ion-modal>

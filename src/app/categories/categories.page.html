@@ -1,0 +1,81 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Categorías</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (categories().length === 0) {
+  <div class="empty-state">
+    <ion-icon name="pricetag-outline" size="large"></ion-icon>
+    <p>No hay categorías</p>
+    <ion-button (click)="openAddModal()">Agregar Categoría</ion-button>
+  </div>
+  } @else {
+  <ion-list inset="true">
+    @for (category of categories(); track category.id) {
+    <ion-item>
+      <div class="category-color" [style.background]="category.color"></div>
+      <ion-label>{{ category.name }}</ion-label>
+      <ion-buttons slot="end">
+        <ion-button color="primary" (click)="openEditModal(category)">
+          <ion-icon slot="icon-only" name="create"></ion-icon>
+        </ion-button>
+        <ion-button color="danger" (click)="confirmDeleteCategory(category)">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+    }
+  </ion-list>
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="openAddModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <app-form-modal
+    [isOpen]="isModalOpen()"
+    [title]="editingCategory() ? 'Editar Categoría' : 'Nueva Categoría'"
+    [isEditing]="!!editingCategory()"
+    [isSaveDisabled]="isSaveDisabled()"
+    (save)="saveCategory()"
+    (dismiss)="closeModal()"
+  >
+    <ion-input
+      label="Nombre"
+      labelPlacement="floating"
+      shape="round"
+      placeholder="Ej. Trabajo, Compras..."
+      [value]="categoryName()"
+      (ionInput)="categoryName.set($any($event.target).value)"
+      class="custom-input"
+    >
+    </ion-input>
+    <div class="color-picker">
+      <p>Color</p>
+      <div class="color-options">
+        @for (color of colorOptions; track color) {
+        <div
+          class="color-option"
+          [style.background]="color"
+          [class.selected]="categoryColor() === color"
+          (click)="categoryColor.set(color)"
+        ></div>
+        }
+      </div>
+    </div>
+  </app-form-modal>
+
+  <app-confirm-modal
+    [isOpen]="isConfirmDeleteOpen()"
+    title="Eliminar Categoría"
+    message="¿Está seguro que desea eliminar esta categoría? Las tareas asociadas perderán su categoría."
+    confirmText="Eliminar"
+    (confirm)="onConfirmDelete()"
+    (cancel)="onCancelDelete()"
+  >
+  </app-confirm-modal>
+</ion-content>

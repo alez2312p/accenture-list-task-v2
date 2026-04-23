@@ -1,0 +1,114 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Mis Tareas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="filter-trigger" (click)="openFilterPicker()">
+    @if (currentFilter(); as filterId) { @if (getCategoryById(filterId); as cat)
+    {
+    <span class="filter-dot" [style.background]="cat.color"></span>
+    {{ cat.name }} } } @else { Todas }
+  </div>
+
+  @if (filteredTasks().length === 0) {
+  <div class="empty-state">
+    <ion-icon name="checkmark-circle-outline" size="large"></ion-icon>
+    <p>No hay tareas</p>
+    <ion-button (click)="openAddModal()">Agregar Tarea</ion-button>
+  </div>
+  } @else {
+  <ion-list inset="true">
+    @for (task of filteredTasks(); track task.id) {
+    <ion-item>
+      <ion-checkbox
+        [checked]="task.completed"
+        (ionChange)="toggleTask(task)"
+        slot="start"
+      >
+      </ion-checkbox>
+      <ion-label [class.completed]="task.completed">
+        {{ task.title }}
+      </ion-label>
+      @if (getCategoryById(task.categoryId); as category) {
+      <ion-badge [style.background]="category.color">
+        {{ category.name }}
+      </ion-badge>
+      }
+      <ion-buttons slot="end">
+        <ion-button color="primary" (click)="openEditModal(task)">
+          <ion-icon slot="icon-only" name="create"></ion-icon>
+        </ion-button>
+        <ion-button color="danger" (click)="confirmDeleteTask(task)">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+    }
+  </ion-list>
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="openAddModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-modal
+    [isOpen]="isFilterPickerOpen()"
+    (didDismiss)="closeFilterPicker()"
+    class="category-picker-modal"
+  >
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Filtrar por Categoría</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeFilterPicker()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-list>
+          <ion-item button (click)="applyFilter(null)">
+            <ion-label>Todas</ion-label>
+            @if (currentFilter() === null) {
+            <ion-icon slot="end" name="checkmark" color="primary"></ion-icon>
+            }
+          </ion-item>
+          @for (category of categories(); track category.id) {
+          <ion-item button (click)="applyFilter(category.id)">
+            <span
+              class="category-color"
+              [style.background]="category.color"
+            ></span>
+            <ion-label>{{ category.name }}</ion-label>
+            @if (currentFilter() === category.id) {
+            <ion-icon slot="end" name="checkmark" color="primary"></ion-icon>
+            }
+          </ion-item>
+          }
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <app-task-form
+    [isOpen]="isModalOpen()"
+    [task]="editingTask()"
+    (save)="onSaveTask($event)"
+    (dismiss)="closeModal()"
+  >
+  </app-task-form>
+
+  <app-confirm-modal
+    [isOpen]="isConfirmDeleteOpen()"
+    title="Eliminar Tarea"
+    message="¿Está seguro que desea eliminar esta tarea?"
+    confirmText="Eliminar"
+    (confirm)="onConfirmDelete()"
+    (cancel)="onCancelDelete()"
+  >
+  </app-confirm-modal>
+</ion-content>
