@@ -1,10 +1,20 @@
-.category-trigger {
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.custom-input {
+  margin-bottom: 0;
+}
+
+.field-trigger {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 14px;
   border: 1px solid var(--ion-color-light);
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   transition: background 0.2s;
 
@@ -13,12 +23,13 @@
   }
 }
 
-.category-trigger-label {
+.field-label {
   font-size: 14px;
   color: var(--ion-color-medium);
+  min-width: 85px;
 }
 
-.category-trigger-value {
+.field-value {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -27,7 +38,19 @@
 
   &.placeholder {
     color: var(--ion-color-medium);
+    opacity: 0.6;
   }
+}
+
+.field-icon {
+  font-size: 16px;
+  color: var(--ion-color-medium);
+}
+
+.status-icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
 }
 
 .category-dot {
@@ -38,4 +61,42 @@
 
 .trigger-arrow {
   color: var(--ion-color-medium);
+}
+
+.date-field {
+  position: relative;
+}
+
+.date-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+ion-modal.picker-modal {
+  --border-radius: 16px;
+  align-items: center;
+}
+
+.picker-modal ion-list {
+  margin: 0;
+}
+
+.picker-modal ion-item {
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+}
+
+.picker-modal .status-icon {
+  font-size: 22px;
+  margin-right: 12px;
+}
+
+.picker-modal .category-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  margin-right: 12px;
 }

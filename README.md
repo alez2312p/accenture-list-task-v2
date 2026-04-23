@@ -4,11 +4,26 @@ Aplicación de tareas (To-Do List) con Ionic y Angular, desarrollada como prueba
 
 ## Características
 
-- **Gestión de tareas**: Crear, editar, eliminar y marcar como completadas
-- **Categorías**: Crear, editar y eliminar categorías con colores personalizados
-- **Filtrado**: Filtrar tareas por categoría (modal scrolleable para 100+ categorías)
-- **Diseño mobile-first**: Optimizado para dispositivos móviles
-- **Persistencia**: Datos guardados en localStorage
+### Gestión de Tareas
+
+- **Estados**: Pendiente, En Proceso, Completada, Cancelada
+- **Tracking de tiempo**: Muestra cuánto tiempo tardaste en completar cada tarea
+- **Fecha límite**: Opcional, muestra "vencida", "hoy", "mañana" o fecha
+- **Diseño Card**: Tarjetas visuales con barra de color según estado
+
+### Funcionalidades
+
+- **Swipe para cambiar estado**: Desliza a derecha para avanzar, izquierda para retroceder
+- **Búsqueda**: Busca tareas por título
+- **Ordenar**: Por fecha creación, fecha vencimiento, o alfabético
+- **Filtrar por estado**: Filtra por estado con chips
+- **Deshacer**: Recupera la última acción borrada
+- **Exportar/Importar**: JSON para backup
+
+### Categorías
+
+- Crear, editar y eliminar categorías con colores personalizados
+- Filtrar por categoría en página separada
 
 ## Requisitos del Entorno
 
@@ -71,70 +86,51 @@ ionic cordova build ios
 
 ```
 src/app/
+├── config/                    # Configuraciones
+│   └── task.config.ts         # Estados y opciones
 ├── models/                    # Modelos de datos
 │   ├── task.model.ts
 │   └── category.model.ts
+├── pipes/                      # Pipes para formatting
+│   ├── index.ts
+│   └── task.pipes.ts          # timeSpent, formatDate, dueDate
 ├── services/                  # Servicios
 │   ├── task.service.ts
 │   └── category.service.ts
-├── components/              # Componentes reutilizables
-│   ├── confirm-modal/       # Modal de confirmación
-│   ├── form-modal/       # Modal de formulario
-│   └── task-form/       # Formulario de tarea
-├── home/                  # Página de tareas
-├── categories/            # Página de categorías
-└── tabs/                # Navegación por tabs
-
-platforms/
-├── android/            # Plataforma Android
-│   └── app/build/outputs/apk/  # APKs generados
-└── ios/                # Plataforma iOS (requiere Mac para generar IPA)
-    └── [IPA location when built]
+├── components/
+│   ├── task-card/            # Componente de tarjeta
+│   ├── task-form/            # Formulario de tarea
+│   ├── confirm-modal/         # Modal de confirmación
+│   └── form-modal/            # Modal de formulario
+├── home/                     # Página principal
+└── categories/               # Página de categorías
 ```
 
 ## Arquitectura
 
 - **Angular 20 + Ionic 8** con Signals para estado reactivo
-- **Components reutilizables** para modales y formularios
-- **Diseño mobile-first** optimizado para listas con 100+ items
-- **Lazy loading** de rutas para mejor rendimiento
+- **Componentes separados**: TaskCardComponent, Pipes, constantes
+- **Diseño mobile-first**: Cards con swipe
+- **Lazy loading** de rutas
 
-## Firebase & Remote Config
+## Estados de Tareas
 
-La aplicación está configurada con Firebase y utiliza Remote Config para un feature flag que controla la visibilidad del botón de edición de tareas.
+| Estado     | Color    | Icono                    | Descripción |
+| ---------- | -------- | ------------------------ | ----------- |
+| Pendiente  | Gris     | ellipse-outline          | Nueva tarea |
+| En Proceso | Amarillo | hourglass-outline        | Trabajando  |
+| Completada | Verde    | checkmark-circle-outline | Finalizada  |
+| Cancelada  | Rojo     | close-circle-outline     | Cancelada   |
 
-### Configuración Inicial
+## Tech Stack
 
-1. Crear proyecto en [Firebase Console](https://console.firebase.google.com)
-2. Agregar app web al proyecto
-3. Habilitar Remote Config en el menú izquierdo
-4. Las credenciales ya están configuradas en `src/environments/environment.ts` y `src/environments/environment.prod.ts`
-
-### Prueba del Feature Flag
-
-Para verificar el funcionamiento del feature flag `show_edit_button`:
-
-1. Acceder a Firebase Console > Proyecto > Remote Config
-2. Asegurarse de que exista el parámetro `show_edit_button` (tipo: Booleano)
-3. Cambiar el valor a `true` para mostrar el botón de edición o `false` para ocultarlo
-4. Click en "Publicar cambios"
-5. Recargar la aplicación (o hacer pull-to-refresh si se ejecuta en dispositivo)
-6. Verificar que el botón de edición aparece/desaparece según el valor configurado
-
-El feature flag está implementado en `src/app/core/services/config.service.ts` y consumido en `src/app/home/home.page.html` para controlar la visibilidad del botón de edición de tareas.
-
-## ⚠️ Nota sobre seguridad de Firebase
-
-La configuración de Firebase incluida contiene API Keys y IDs de proyecto que, según la [documentación oficial de Firebase](https://firebase.google.com/docs/projects/api-keys), están diseñados para ser expuestos en código cliente. La seguridad de los datos de Firebase proviene de las Rules de Firebase, no de ocultar estas credenciales.
-
-En esta implementación:
-- Firebase se usa **exclusivamente para Remote Config** (feature flag que controla la visibilidad del botón de edición)
-- Los datos de la aplicación se almacenan en **localStorage** (no en Firebase)
-- Por lo tanto, incluso si se expusieran estas credenciales, el impacto estaría limitado a la configuración de Remote Config
-
-Para producción con almacenamiento de datos en Firebase, se recomendaría:
-- Revisar y ajustar las Firebase Rules siguiendo el principio de privilegio mínimo
-- Considerar Firebase App Check para validar que solo tu aplicación acceda a los recursos
+| Tecnología | Versión |
+| ---------- | ------- |
+| Angular    | 20      |
+| Ionic      | 8       |
+| TypeScript | 5.9+    |
+| Cordova    | -       |
+| Ionicons   | 7.0.0   |
 
 ## Licencia
 

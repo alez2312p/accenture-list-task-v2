@@ -1,5 +1,7 @@
 import { Injectable, signal, effect, computed } from '@angular/core';
-import { Task } from '../models/task.model';
+import { Task, TaskStatus } from '../models/task.model';
+
+export type SortBy = 'created' | 'dueDate' | 'title';
 
 @Injectable({
   providedIn: 'root',
@@ -10,15 +12,14 @@ export class TaskService {
   private _tasks = signal<Task[]>(this.loadFromStorage());
   public tasks = this._tasks.asReadonly();
 
-  public filterByCategoryId = signal<string | null>(null);
+  private _lastAction = signal<{
+    type: string;
+    task?: Task;
+    taskData?: Partial<Task>;
+  } | null>(null);
 
-  public filteredTasks = computed(() => {
-    const categoryId = this.filterByCategoryId();
-    const allTasks = this._tasks();
-    return categoryId
-      ? allTasks.filter((t) => t.categoryId === categoryId)
-      : allTasks;
-  });
+  public sortBy = signal<SortBy>('created');
+  public searchQuery = signal<string>('');
 
   constructor() {
     effect(() => {
@@ -28,44 +29,79 @@ export class TaskService {
 
   private loadFromStorage(): Task[] {
     const stored = localStorage.getItem(this.STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+
+    const rawTasks: (Task & { completed?: boolean })[] = JSON.parse(stored);
+    return rawTasks.map((t) => {
+      const status: TaskStatus =
+        t.status || (t.completed ? 'completed' : 'pending');
+      return {
+        id: t.id,
+        title: t.title,
+        status,
+        categoryId: t.categoryId,
+        createdAt: new Date(t.createdAt),
+        statusChangedAt: t.statusChangedAt
+          ? new Date(t.statusChangedAt)
+          : new Date(t.createdAt),
+        dueDate: t.dueDate ? new Date(t.dueDate) : undefined,
+      };
+    });
   }
 
-  getTasks(): Task[] {
-    return this._tasks();
-  }
-
-  getTasksByCategory(categoryId?: string): Task[] {
-    return categoryId
-      ? this._tasks().filter((t) => t.categoryId === categoryId)
-      : this._tasks();
-  }
-
-  createTask(title: string, categoryId?: string): void {
+  createTask(
+    title: string,
+    categoryId?: string,
+    status: TaskStatus = 'pending',
+    dueDate?: Date,
+  ): void {
+    const now = new Date();
     const newTask: Task = {
       id: crypto.randomUUID(),
       title,
-      completed: false,
+      status,
       categoryId,
-      createdAt: new Date(),
+      createdAt: now,
+      statusChangedAt: now,
+      dueDate,
     };
     this._tasks.update((prev) => [...prev, newTask]);
+    this._lastAction.set({ type: 'create', task: newTask });
   }
 
-  updateTask(id: string, title: string, categoryId?: string): void {
+  updateTask(
+    id: string,
+    data: Partial<Pick<Task, 'title' | 'categoryId' | 'dueDate'>>,
+  ): void {
+    const task = this._tasks().find((t) => t.id === id);
     this._tasks.update((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, title, categoryId } : t)),
+      prev.map((t) => (t.id === id ? { ...t, ...data } : t)),
     );
+    const updated = this._tasks().find((t) => t.id === id);
+    if (updated && task) {
+      this._lastAction.set({ type: 'update', task, taskData: data });
+    }
   }
 
-  toggleTaskCompleted(id: string): void {
+  updateTaskStatus(id: string, status: TaskStatus): void {
+    const task = this._tasks().find((t) => t.id === id);
     this._tasks.update((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
+      prev.map((t) => {
+        if (t.id !== id) return t;
+        return { ...t, status, statusChangedAt: new Date() };
+      }),
     );
+    if (task) {
+      this._lastAction.set({ type: 'status', task, taskData: { status } });
+    }
   }
 
   deleteTask(id: string): void {
+    const task = this._tasks().find((t) => t.id === id);
     this._tasks.update((prev) => prev.filter((t) => t.id !== id));
+    if (task) {
+      this._lastAction.set({ type: 'delete', task });
+    }
   }
 
   deleteTasksByCategory(categoryId: string): void {
@@ -74,7 +110,11 @@ export class TaskService {
     );
   }
 
-  setFilter(categoryId: string | null): void {
-    this.filterByCategoryId.set(categoryId);
+  setSearchQuery(query: string): void {
+    this.searchQuery.set(query);
+  }
+
+  setSortBy(sort: SortBy): void {
+    this.sortBy.set(sort);
   }
 }

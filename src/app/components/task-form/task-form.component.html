@@ -5,29 +5,87 @@
   [isSaveDisabled]="isSaveDisabled()"
   (save)="onSave()"
   (dismiss)="onDismiss()">
-  <ion-input
-    label="Título"
-    labelPlacement="floating"
-    placeholder="Ingresa la tarea"
-    [value]="title()"
-    (ionInput)="onTitleInput($any($event.target).value)"
-    class="custom-input">
-  </ion-input>
-  <div class="category-trigger" (click)="openCategoryPicker()">
-    <span class="category-trigger-label">Categoría</span>
-    @if (getSelectedCategory(); as cat) {
-    <div class="category-trigger-value">
-      <span class="category-dot" [style.background]="cat.color"></span>
-      {{ cat.name }}
+  <div class="form-fields">
+    <ion-input
+      label="Título"
+      labelPlacement="floating"
+      placeholder="Ingresa la tarea"
+      [value]="title()"
+      (ionInput)="onTitleInput($any($event.target).value)"
+      class="custom-input">
+    </ion-input>
+    <div class="field-trigger" (click)="openStatusPicker()">
+      <span class="field-label">Estado</span>
+      <div class="field-value">
+        <span class="status-icon" [style.color]="getSelectedStatus().color">
+          <ion-icon [name]="getSelectedStatus().icon"></ion-icon>
+        </span>
+        {{ getSelectedStatus().label }}
+      </div>
+      <ion-icon name="chevron-forward" class="trigger-arrow"></ion-icon>
     </div>
-    } @else {
-    <div class="category-trigger-value placeholder">Sin categoría</div>
-    }
-    <ion-icon name="chevron-forward" class="trigger-arrow"></ion-icon>
+    <div class="field-trigger date-field" (click)="$any($event.target).showPicker?.()">
+      <span class="field-label">Vencimiento</span>
+      <input
+        type="date"
+        [value]="dueDate() ? dueDate()!.toISOString().split('T')[0] : ''"
+        [min]="getMinDate()"
+        (ionInput)="onDueDateChange($event)"
+        class="date-input"
+      />
+      <div class="field-value">
+        @if (dueDate(); as date) {
+        {{ date.toLocaleDateString('es-ES') }}
+        } @else {
+        <span class="placeholder">Sin fecha</span>
+        }
+      </div>
+      <ion-icon name="chevron-forward" class="trigger-arrow"></ion-icon>
+    </div>
+    <div class="field-trigger" (click)="openCategoryPicker()">
+      <span class="field-label">Categoría</span>
+      @if (getSelectedCategory(); as cat) {
+      <div class="field-value">
+        <span class="category-dot" [style.background]="cat.color"></span>
+        {{ cat.name }}
+      </div>
+      } @else {
+      <div class="field-value placeholder">Sin categoría</div>
+      }
+      <ion-icon name="chevron-forward" class="trigger-arrow"></ion-icon>
+    </div>
   </div>
 </app-form-modal>
 
-<ion-modal [isOpen]="isCategoryPickerOpen()" (didDismiss)="closeCategoryPicker()" class="category-picker-modal">
+<ion-modal [isOpen]="isStatusPickerOpen()" (didDismiss)="closeStatusPicker()" class="picker-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Seleccionar Estado</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeStatusPicker()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list>
+        @for (option of statusOptions; track option[0]) {
+        <ion-item button (click)="selectStatus(option[0])">
+          <span class="status-icon" [style.color]="option[1].color" slot="start">
+            <ion-icon [name]="option[1].icon"></ion-icon>
+          </span>
+          <ion-label>{{ option[1].label }}</ion-label>
+          @if (status() === option[0]) {
+          <ion-icon slot="end" name="checkmark" color="primary"></ion-icon>
+          }
+        </ion-item>
+        }
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<ion-modal [isOpen]="isCategoryPickerOpen()" (didDismiss)="closeCategoryPicker()" class="picker-modal">
   <ng-template>
     <ion-header>
       <ion-toolbar>

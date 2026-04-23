@@ -1,0 +1,67 @@
+<ion-item-sliding #slidingItem>
+  <ion-item lines="full" class="task-item">
+    <div class="task-card" [class]="'card-' + task().status">
+      <div class="task-status-bar" [class]="'bar-' + task().status"></div>
+      <div class="task-content">
+        <div class="task-header">
+          <span class="task-title">{{ task().title }}</span>
+          <div class="task-actions">
+            <ion-button fill="clear" size="small" (click)="onEdit()">
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-button>
+            <ion-button
+              fill="clear"
+              size="small"
+              color="danger"
+              (click)="onDelete()"
+            >
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+        <div class="task-meta">
+          @if (showTime()) {
+            <span class="meta-item">
+              <ion-icon name="time-outline"></ion-icon>
+              {{ task().createdAt | timeSpent: task().status }}
+            </span>
+          }
+          @if (showCreatedDate()) {
+            <span class="meta-item">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ task().createdAt | formatDate }}
+            </span>
+          }
+@if (task().dueDate) {
+            <span class="meta-item" [class.overdue]="isOverdue()">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              {{ task().dueDate | dueDate: task().status }}
+            </span>
+          }
+        </div>
+        @if (category(); as cat) {
+          <div class="task-category">
+            <span class="category-dot" [style.background]="cat.color"></span>
+            {{ cat.name }}
+          </div>
+        }
+      </div>
+    </div>
+  </ion-item>
+  <ion-item-options side="start" (ionSwipe)="onSwipePrev()">
+    @if (getPrevStatus()) {
+      <ion-item-option [color]="getPrevStatusColor()">
+        <ion-icon name="chevron-back"></ion-icon>
+        {{ statusConfig[getPrevStatus()!].label }}
+      </ion-item-option>
+    }
+  </ion-item-options>
+  <ion-item-options side="end" (ionSwipe)="onSwipeNext()">
+    @if (getNextStatus()) {
+      <ion-item-option [color]="getNextStatusColor()">
+        {{ statusConfig[getNextStatus()!].label }}
+        <ion-icon name="chevron-forward"></ion-icon>
+      </ion-item-option>
+    }
+  </ion-item-options>
+</ion-item-sliding>
