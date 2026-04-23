@@ -30,7 +30,7 @@
         type="date"
         [value]="dueDate() ? dueDate()!.toISOString().split('T')[0] : ''"
         [min]="getMinDate()"
-        (ionInput)="onDueDateChange($event)"
+        (change)="onDueDateChange($event)"
         class="date-input"
       />
       <div class="field-value">
